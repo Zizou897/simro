@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # App created
+    'app',
     'users',
     'web',
     
@@ -71,9 +72,11 @@ X_FRAMES = 'SAMEORIGIN'
 CORS_ALLOW_ALL_ORIGINS: True
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Admin",
-    "related_modal_active": True
+    "site_title": "SIMRO",
+    "related_modal_active": True,
 }
+
+JAZZMIN_SETTINGS["show_ui_builder"] = True
 
 
 AUTH_USER_MODEL = "users.User"
