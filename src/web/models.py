@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 # Create your models here.
 
-User = get_user_model()
+
 
 class Convention(models.Model):
     date_add = models.DateTimeField( auto_now=False, auto_now_add=True)
@@ -14,11 +14,12 @@ class Convention(models.Model):
         abstract = True
 
 class TypeActeur(Convention):
-    code_type_acteur = models.CharField(max_length = 150)
+    code_type_acteur = models.CharField(max_length=150)
+    nom_type_acteur = models.CharField(max_length=250, default="agriculteur")
     libele = models.CharField(max_length=50)
     
     def __str__(self):
-        return self.code_type_acteur
+        return self.nom_type_acteur
 
 
 class Acteur(Convention):
@@ -26,11 +27,14 @@ class Acteur(Convention):
     code_acteur = models.CharField(max_length=50)
     coordonnee = models.CharField(max_length=50)
     picture = models.FileField(upload_to="acteur_img")
-    #user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    utilisateur = models.ForeignKey("users.User", related_name="user_acteur", on_delete=models.CASCADE)
     
     def __str__(self):
         return self.code_acteur
     
+    @property
+    def code_type_acteur(self):
+        return self.type_acteur.code_type_acteur
 
 
 
@@ -45,10 +49,13 @@ class TypeFilier(Convention):
 class Filiere(Convention):
     code_filiere = models.CharField(max_length=50)
     nom_filiere = models.CharField(max_length=50)
-    #code_type_filiere = models.ForeignKey(TypeFilier, on_delete=models.CASCADE)
+    code_type_filiere = models.ForeignKey(TypeFilier, on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
         return self.nom_filiere
+    
+    def code_type_filieres(self):
+        return self.code_type_filiere.code_type_filiere
 
 
 class Region(Convention):
@@ -105,8 +112,9 @@ class TypeMarche(Convention):
         return self.code_type_marche
     
 class Marche(Convention):
+    nom_marche = models.CharField(max_length=250, default="marché mamiAdjoua")
     code_marche = models.CharField(max_length=50)
-    code_type_marche = models.ForeignKey("web.TypeMarche", on_delete=models.CASCADE)
+    code_type_marche = models.ForeignKey("web.TypeMarche", on_delete=models.SET_NULL, null=True)
     locaclite = models.ForeignKey("web.Localite", on_delete=models.SET_NULL, null=True)
     jour_marche = models.ManyToManyField("app.Jour")
     code_superviseur =  models.ForeignKey(get_user_model(),on_delete=models.SET_NULL, null=True)
@@ -116,7 +124,7 @@ class Marche(Convention):
     photo = models.FileField(upload_to='img_marche')
     
     def __str__(self):
-        return self.code_marche
+        return self.nom_marche
     
 
 class Magasin(Convention):
@@ -132,4 +140,56 @@ class Magasin(Convention):
         return self.code_magasin
 
 
+CHOICE_SEX = (
+    ("M","Homme"),
+    ("F","Femme"),
+)
 
+
+class Enqueteur(Convention):
+    code_enqueteur = models.CharField(max_length=50)
+    nom_enqueteur = models.CharField(max_length=250)
+    code_acteur = models.OneToOneField("users.User", on_delete=models.SET_NULL, null=True)
+    localite_enqueteur = models.CharField(max_length=250)
+    sexe = models.CharField(max_length=50, choices=CHOICE_SEX)
+    photo = models.FileField(upload_to='img_enqueteur')
+    
+    def __str__(self):
+        return self.nom_enqueteur
+    
+    def nomEnqueteur(self):
+        return self.code_acteur.username
+    
+
+
+class Stock(Convention):
+    code_stock = models.CharField( max_length=50)
+    date_recolte = models.DateField(auto_now=True, auto_now_add=False)
+    code_produit = models.ForeignKey("web.Produit", on_delete=models.SET_NULL, null=True)
+    code_magasin = models.ForeignKey("web.Magasin", on_delete=models.SET_NULL, null=True)
+    code_acteur = models.ForeignKey("web.Acteur", on_delete=models.SET_NULL, null=True)
+    code_unite_produit = models.ForeignKey("app.UniteProduit", on_delete=models.SET_NULL, null=True)
+    code_enqueteur = models.ForeignKey("web.Enqueteur", on_delete=models.SET_NULL, null=True)
+    date_prelevement = models.DateField(auto_now=True, auto_now_add=False)
+    quantite_stock = models.IntegerField()
+    information_production = models.TextField()
+    information_stockage = models.TextField()
+    photo = models.FileField(upload_to='img_stock')
+    
+    def __str__(self):
+        return self.code_stock
+    
+    def code_enqueteurs(self):
+        return self.code_enqueteur.code_enqueteur
+    
+
+class SortieStock(Convention):
+    date_sortie = models.DateTimeField(auto_now=True, auto_now_add=False)
+    quantite_sortie = models.IntegerField()
+    prix_vente = models.FloatField()
+    code_acteur_destinateur = models.ForeignKey("web.Acteur", on_delete=models.SET_NULL, null=True)
+    code_stock = models.ForeignKey("web.Stock", on_delete=models.CASCADE)
+    code_enqueteur = models.ForeignKey("web.Enqueteur", on_delete=models.SET_NULL, null=True)
+    
+    def __str__(self):
+        return self.code_stock.code_stock

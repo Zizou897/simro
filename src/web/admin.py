@@ -12,15 +12,19 @@ class TypeActeurAdmin(admin.ModelAdmin):
 
 @admin.register(Acteur)
 class ActeurAdmin(admin.ModelAdmin):
-    list_display = ('image_view', 'code_acteur', 'publish')
+    list_display = ('image_view', 'code_acteur', 'code_type_acteur', 'publish')
     
     def image_view(self, obj):
         return mark_safe(f'<img src= "{obj.picture.url}" style ="height:100px; width:200px>"')
 
+@admin.register(TypeFilier)
+class TypeFilierAdmin(admin.ModelAdmin):
+    list_display = ('code_type_filiere', 'nom_type_filiere', 'publish')
+
     
 @admin.register(Filiere)
 class FiliereAdmin(admin.ModelAdmin):
-    list_display = ('code_filiere', 'nom_filiere', 'publish')
+    list_display = ('code_filiere', 'nom_filiere', 'code_type_filieres', 'publish')
 
 
 @admin.register(TypeMarche)
@@ -71,3 +75,25 @@ class FormeAdmin(admin.ModelAdmin):
 class MaillonAdmin(admin.ModelAdmin):
     list_display = ('nom_maillon', 'publish')
 
+
+
+@admin.register(Enqueteur)
+class EnqueteurAdmin(admin.ModelAdmin):
+    list_display = ('image_view', 'code_enqueteur', 'nomEnqueteur', 'sexe', 'publish')
+    
+    def image_view(self, obj):
+        return mark_safe(f'<img src= "{obj.photo.url}" style ="height:100px; width:200px>"')
+ 
+ 
+@admin.register(Stock)
+class StockAdmin(admin.ModelAdmin):
+    list_display = ('image_view', 'code_stock', 'code_enqueteurs', 'publish')
+    
+    def image_view(self, obj):
+        return mark_safe(f'<img src= "{obj.photo.url}" style ="height:100px; width:200px>"')
+ 
+ 
+@admin.register(SortieStock)
+class SortieStockAdmin(admin.ModelAdmin):
+    list_display = ('code_stock','publish')
+    
