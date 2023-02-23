@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-p)b0yq+l*^bym+kbjkfmjtk&9i=1&673y8s8&l0if9t3fc(72j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -70,13 +70,6 @@ REST_FRAMEWORK = {
 X_FRAMES = 'SAMEORIGIN'
 
 CORS_ALLOW_ALL_ORIGINS: True
-
-JAZZMIN_SETTINGS = {
-    "site_title": "SIMRO",
-    "related_modal_active": True,
-}
-
-JAZZMIN_SETTINGS["show_ui_builder"] = True
 
 
 AUTH_USER_MODEL = "users.User"

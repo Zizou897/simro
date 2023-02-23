@@ -1,12 +1,7 @@
 from django.contrib import admin
 
 from .models import *
-# Register your models here.
-
-@admin.register(Jour)
-class JourAdmin(admin.ModelAdmin):
-    list_display = ('jour', 'publish')
-    
+# Register your models here.  
     
 @admin.register(Campagne)
 class CampagneAdmin(admin.ModelAdmin):

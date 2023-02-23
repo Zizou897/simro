@@ -12,7 +12,7 @@ class TypeActeurAdmin(admin.ModelAdmin):
 
 @admin.register(Acteur)
 class ActeurAdmin(admin.ModelAdmin):
-    list_display = ('image_view', 'code_acteur', 'code_type_acteur', 'publish')
+    list_display = ('image_view', 'code_acteur', 'publish')
     
     def image_view(self, obj):
         return mark_safe(f'<img src= "{obj.picture.url}" style ="height:100px; width:200px>"')

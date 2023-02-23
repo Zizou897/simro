@@ -25,16 +25,17 @@ class TypeActeur(Convention):
 class Acteur(Convention):
     type_acteur = models.ManyToManyField("web.TypeActeur",)
     code_acteur = models.CharField(max_length=50)
-    coordonnee = models.CharField(max_length=50)
+    nom = models.CharField(max_length=250,  null=True, blank=True)
+    coordonnee = models.CharField(max_length=250,  null=True, blank=True)
+    categorie = models.CharField(max_length=250,  null=True, blank=True)
     picture = models.FileField(upload_to="acteur_img")
-    utilisateur = models.ForeignKey("users.User", related_name="user_acteur", on_delete=models.CASCADE)
+    email = models.EmailField(max_length=254, null=True, blank=True)
+    phone = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField()
+    utilisateur = models.ForeignKey("users.User", related_name="user_acteur", on_delete=models.SET_NULL, null=True, blank=True)
     
     def __str__(self):
-        return self.code_acteur
-    
-    @property
-    def code_type_acteur(self):
-        return self.type_acteur.code_type_acteur
+        return self.nom
 
 
 
