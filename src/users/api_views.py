@@ -90,4 +90,4 @@ def sign_out(request):
     logout(request)
     message = 'utilisateur déconnecté'
 
-    return Response({'mesdage':message})
+    return Response(data={'mesdage':message}, status=status.HTTP_200_OK)

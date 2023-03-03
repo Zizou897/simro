@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 # Create your views here.
 
-User = get_user_model()
+from users.models import User
 
 
 
@@ -54,7 +54,7 @@ def singUp(request):
             print(password)
             return redirect("login")
     
-    template_name = 'app/auth/register.html'
+    template_name = 'admin/app/auth/register.html'
     context={}
     return render(request, template_name, context)
 
@@ -64,13 +64,24 @@ def singIn(request):
     if  request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        if not username or username.isspace()  or not password or password.isspace():
+            messages.error(request, "Veuillez remplir tous les champs")
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_superuser:
+            login(request, user)
+            return redirect("home")
+        return redirect("login")
+    """ 
+    if  request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         print("******")
         if not username or username.isspace()  or not password or password.isspace():
             print("******12*****")
             messages.error(request, "Veuillez remplir tous les champs")
             return redirect("login")
         print("######1######")
-        username_exists = User.objects.filter(username=username).exists()
+        username_exists = User.objects.filter(username=username)
         if not username_exists:
             messages.error(request, "Nom d'utlisateur ou mot de passe incorrect")
             print("######2######")
@@ -88,7 +99,8 @@ def singIn(request):
                 return redirect("home")
         messages.error(request,'Votre compte n\'est pas activé')
         return redirect('login')
-    template_name = 'app/auth/login.html'
+    """
+    template_name = 'app/admin/auth/login.html'
     context={}
     return render(request, template_name, context)
 
