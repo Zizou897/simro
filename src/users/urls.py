@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from  .api_views import sign_out, SignUpView, LoginView
 from .views import singIn, singUp, signOut

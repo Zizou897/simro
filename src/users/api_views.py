@@ -33,12 +33,22 @@ class SignUpView(generics.GenericAPIView):
             serializer.save()
             
             response = {
+                "code": 1,
+                "status": status.HTTP_200_OK,
                 "message": "L'utlisateur est bel et bien enregistré",
                 "data": serializer.data
             }
             
             return Response(data=response, status=status.HTTP_201_CREATED)
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        response = {
+            "code": 0,
+            "status": status.HTTP_200_OK,
+            "message": "L'utlisateur non enregistré",
+            "data": serializer.errors
+        }
+        
+        return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -50,22 +60,44 @@ class LoginView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         my_user = User.objects.get(username=username)
+       
+        user = authenticate(username=username, password=password)
+        print(user)
         
-        if my_user.is_active:
-            user = authenticate(username=username, password=password)
-            print(user)
-            
-            if user is not None:
+        if user is not None:
+            if user.is_active:
                 response = {
+                    "code": 1,
+                    "status": status.HTTP_200_OK,
                     "message": "vous etes connecté",
                     "token":  user.auth_token.key,
-                    "username": user.username,
+                    "user":{
+                        "username": user.username,
+                        "email": user.email,
+                        "phone": user.phone,
+                    }
                 }
                 return Response(data=response, status=status.HTTP_200_OK)
             else:
-                return Response(data={"message":"username ou mot de passe incorrect",})
+                
+                response = {
+                    "code": 0,
+                    "status": status.HTTP_200_OK,
+                    "message": "votre compte n'est pas actif, veuillez contacter l'admin",
+                    "token":  None,
+                    "user": None
+                }
+                return Response(data=response)
+                
+        response = {
+            "code": 0,
+            "status": status.HTTP_200_OK,
+            "message": "username ou mot de passe incorrect",
+            "user": None
+        }
+        return Response(data=response)
 
-        return Response(data={"message": "votre compte n'est pas actif, veuillez contacter l'admin"})
+        
         
     
     @swagger_auto_schema(
@@ -84,10 +116,13 @@ class LoginView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sign_out(request):
+    
     message = ''
 
-    request.user.auth_token.delete()
+
+    Token.objects.filter(user=request.user).delete()
     logout(request)
+    
     message = 'utilisateur déconnecté'
 
     return Response(data={'mesdage':message}, status=status.HTTP_200_OK)

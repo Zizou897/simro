@@ -20,9 +20,18 @@ class UserSerializer(serializers.ModelSerializer):
         
     
     def validate(self, attrs):
+        username_exists = User.objects.filter(username=attrs['username']).exists()
         email_exists = User.objects.filter(email=attrs['email']).exists()
+        phone_exists = User.objects.filter(phone=attrs['phone']).exists()
+        if username_exists:
+            raise ValidationError("username exists déjà")
+        
         if email_exists:
             raise ValidationError("email exists déjà")
+        
+        if phone_exists:
+            raise ValidationError("numero de téléphone exists déjà")
+        
         return super().validate(attrs)
 
     def create(self, validated_data):
